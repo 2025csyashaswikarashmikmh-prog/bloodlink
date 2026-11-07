@@ -1,0 +1,70 @@
+# RaktaSetu - full stack: nginx frontend, FastAPI backend, ML service, PostgreSQL, Redis
+name: raktasetu
+
+services:
+  frontend:
+    image: ${REGISTRY:-raktasetu}/raktasetu-frontend:${TAG:-latest}
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backend:
+    image: ${REGISTRY:-raktasetu}/raktasetu-backend:${TAG:-latest}
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://raktasetu:${POSTGRES_PASSWORD:-raktasetu}@db:5432/raktasetu
+      REDIS_URL: redis://redis:6379/0
+      ML_SERVICE_URL: http://ml-service:8001
+      JWT_SECRET: ${JWT_SECRET:-change-this-long-random-secret-before-production}
+      DEMO_MODE: ${DEMO_MODE:-true}
+      RESPONSE_WINDOW_SEC: ${RESPONSE_WINDOW_SEC:-120}
+      COMMITMENT_WINDOW_MIN: ${COMMITMENT_WINDOW_MIN:-90}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ml-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ml-service:
+    image: ${REGISTRY:-raktasetu}/raktasetu-ml:${TAG:-latest}
+    build: ./ml-service
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: raktasetu
+      POSTGRES_USER: raktasetu
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-raktasetu}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raktasetu -d raktasetu"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

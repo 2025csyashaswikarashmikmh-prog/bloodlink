@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RaktaSetu — Voice-first blood emergency network</title>
+  <meta name="description" content="Request or donate blood by speaking in your own language. Live donor matching, verified commitment and automatic escalation." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23B42318' d='M12 2C9 7 5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-4-8-7-13z'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script>
+    // Empty = same origin (nginx proxies /api and /ws in Docker). config.js may override for other hosts.
+    window.__API_BASE__ = window.__API_BASE__ || '';
+  </script>
+  <script src="./config.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="#/" aria-label="RaktaSetu home">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="brand-mark"><path d="M12 2C9 7 5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-4-8-7-13z" fill="currentColor"/><path d="M9 15.5h6M12 12.5v6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>RaktaSetu</span>
+    </a>
+    <nav class="tabs" aria-label="Main">
+      <a href="#/" data-route="assistant" data-i18n="nav_assistant">Assistant</a>
+      <a href="#/requests" data-route="requests" data-i18n="nav_requests">Requests</a>
+      <a href="#/donor" data-route="donor" data-i18n="nav_donor">Donor</a>
+      <a href="#/banks" data-route="banks" data-i18n="nav_banks">Blood banks</a>
+      <a href="#/admin" data-route="admin" data-i18n="nav_admin">Admin</a>
+    </nav>
+    <div class="top-right">
+      <label class="sr-only" for="langSelect">Language</label>
+      <select id="langSelect" class="lang-select" aria-label="Language"></select>
+      <div id="userChip"></div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1"></main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="langGate" class="lang-gate" hidden>
+    <div class="lang-card">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="gate-drop"><path d="M12 2C9 7 5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-4-8-7-13z" fill="currentColor"/></svg>
+      <h1>RaktaSetu</h1>
+      <p class="gate-sub">Choose your language · ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ · भाषा चुनें · மொழியைத் தேர்ந்தெடுக்கவும் · భాష ఎంచుకోండి</p>
+      <div id="langButtons" class="lang-grid"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <script src="./i18n.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
